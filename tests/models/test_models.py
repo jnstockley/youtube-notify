@@ -44,7 +44,9 @@ def test_content_repr_hashability_and_validation() -> None:
                 "id": "video-123",
                 "title": "Launch Video",
                 "published_at": datetime(2026, 5, 30, 17, 28, 38),
-                "thumbnail_url": HttpUrl("https://i.ytimg.com/vi/video-123/maxresdefault.jpg"),
+                "thumbnail_url": HttpUrl(
+                    "https://i.ytimg.com/vi/video-123/maxresdefault.jpg"
+                ),
                 "description": "A sample description.",
                 "content_type": ContentType.VIDEO,
                 "channel": channel,

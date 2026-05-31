@@ -32,7 +32,9 @@ def _api_item(
     }
 
 
-def test_get_content_merges_results_and_deduplicates(monkeypatch: pytest.MonkeyPatch) -> None:
+def test_get_content_merges_results_and_deduplicates(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     playlist_ids = ["playlist-1", "playlist-2", "playlist-3"]
     expected = Content(
         id="video-123",
@@ -111,7 +113,9 @@ def test_fetch_and_parse_api_response_uses_to_thread_twice(
     ]
 
 
-def test_parse_api_response_returns_empty_set_for_no_items(caplog: pytest.LogCaptureFixture) -> None:
+def test_parse_api_response_returns_empty_set_for_no_items(
+    caplog: pytest.LogCaptureFixture,
+) -> None:
     with caplog.at_level("DEBUG", logger=youtube_module.logger.name):
         result = youtube_module.__parse_api_response([])
 
@@ -146,9 +150,10 @@ def test_parse_api_response_parses_public_items_and_stops_after_ten(
 
     parsed = next(content for content in result if content.id == "video-1")
     assert parsed.title == "Launch Video video-1"
-    assert parsed.published_at == datetime.fromisoformat(
-        "2026-05-30T17:28:38+00:00"
-    ).astimezone()
+    assert (
+        parsed.published_at
+        == datetime.fromisoformat("2026-05-30T17:28:38+00:00").astimezone()
+    )
     assert str(parsed.thumbnail_url) == (
         "https://i.ytimg.com/vi/video-1/maxresdefault.jpg"
     )

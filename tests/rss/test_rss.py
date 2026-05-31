@@ -46,7 +46,9 @@ def test_fetch_and_parse_feed_uses_to_thread_twice(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     calls: list[tuple[str, tuple[object, ...]]] = []
-    feed = SimpleNamespace(href="https://www.youtube.com/feeds/videos.xml?playlist_id=UULF123")
+    feed = SimpleNamespace(
+        href="https://www.youtube.com/feeds/videos.xml?playlist_id=UULF123"
+    )
     expected = {"parsed"}
 
     def fake_get_feed(playlist_id: str) -> object:

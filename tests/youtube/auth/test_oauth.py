@@ -8,7 +8,13 @@ from google.oauth2.credentials import Credentials
 
 
 class FakeResponse:
-    def __init__(self, status_code: int, payload: dict | None = None, *, json_error: Exception | None = None):
+    def __init__(
+        self,
+        status_code: int,
+        payload: dict | None = None,
+        *,
+        json_error: Exception | None = None,
+    ):
         self.status_code = status_code
         self._payload = payload or {}
         self._json_error = json_error
@@ -100,7 +106,9 @@ def test_fetch_device_code_success(monkeypatch: pytest.MonkeyPatch) -> None:
     )
 
 
-def test_fetch_device_code_rejects_missing_fields(monkeypatch: pytest.MonkeyPatch) -> None:
+def test_fetch_device_code_rejects_missing_fields(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     response = FakeResponse(200, {"device_code": "device-123"})
     monkeypatch.setattr(oauth_module.requests, "post", Mock(return_value=response))
 
@@ -242,7 +250,9 @@ def test_refresh_credentials_calls_refresh(monkeypatch: pytest.MonkeyPatch) -> N
     request.assert_called_once_with()
 
 
-def test_refresh_credentials_propagates_refresh_errors(monkeypatch: pytest.MonkeyPatch) -> None:
+def test_refresh_credentials_propagates_refresh_errors(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     creds = Credentials(
         token="token",
         refresh_token="refresh-token",
@@ -262,7 +272,9 @@ def test_refresh_credentials_propagates_refresh_errors(monkeypatch: pytest.Monke
         oauth_module.__refresh_credentials(creds)
 
 
-def test_poll_for_tokens_handles_pending_then_success(monkeypatch: pytest.MonkeyPatch) -> None:
+def test_poll_for_tokens_handles_pending_then_success(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     responses = iter(
         [
             FakeResponse(428, {"error": "authorization_pending"}),
@@ -274,7 +286,9 @@ def test_poll_for_tokens_handles_pending_then_success(monkeypatch: pytest.Monkey
     monkeypatch.setattr(oauth_module, "sleep", lambda seconds: None)
     monkeypatch.setattr(oauth_module, "monotonic", lambda: 0)
 
-    result = oauth_module.__poll_for_tokens("client-id", "client-secret", "device", 1, 10)
+    result = oauth_module.__poll_for_tokens(
+        "client-id", "client-secret", "device", 1, 10
+    )
 
     assert result == {"access_token": "access-token"}
 
@@ -337,7 +351,9 @@ def test_poll_for_tokens_handles_slow_down_then_success(
     monkeypatch.setattr(oauth_module, "sleep", lambda seconds: None)
     monkeypatch.setattr(oauth_module, "monotonic", lambda: 0)
 
-    result = oauth_module.__poll_for_tokens("client-id", "client-secret", "device", 1, 10)
+    result = oauth_module.__poll_for_tokens(
+        "client-id", "client-secret", "device", 1, 10
+    )
 
     assert result == {"access_token": "access-token"}
 
@@ -347,7 +363,9 @@ def test_poll_for_tokens_expires_when_deadline_is_reached(
 ) -> None:
     responses = iter([FakeResponse(428, {"error": "authorization_pending"})])
     times = iter([0, 0, 20])
-    monkeypatch.setattr(oauth_module.requests, "post", Mock(side_effect=lambda *a, **k: next(responses)))
+    monkeypatch.setattr(
+        oauth_module.requests, "post", Mock(side_effect=lambda *a, **k: next(responses))
+    )
     monkeypatch.setattr(oauth_module, "sleep", lambda seconds: None)
     monkeypatch.setattr(oauth_module, "monotonic", lambda: next(times))
 
