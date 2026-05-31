@@ -1,0 +1,28 @@
+[project]
+name = "js-python-starter"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.13, <4.0"
+license-files = ["LICENSE"]
+authors = [
+    { name = "Jack Stockley", email = "jack@jstockley.com"}
+]
+keywords = ["starter", "template", "python"]
+classifiers = [
+    "Programming Language :: Python :: 3",
+]
+dependencies = [
+    "python-dotenv==1.2.2",
+]
+[project.urls]
+Homepage = "https://github.com/jnstockley/python-starter"
+Repository = "https://github.com/jnstockley/python-starter.git"
+Issues = "https://github.com/jnstockley/python-starter/issues"
+
+[dependency-groups]
+dev = [
+    "pytest>=8.3.5",
+    "pytest-cov>=6.0.0",
+    "ruff>=0.13.2",
+]

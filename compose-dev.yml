@@ -1,0 +1,32 @@
+---
+name: Python Starter Project (Dev)
+services:
+  python-starter:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: python-starter-dev
+    env_file:
+      - .env
+    # Add ports if needed
+    # ports:
+    #   - '0.0.0.0:5001:5000'
+    volumes:
+      - ./logs:/app/logs
+    restart: unless-stopped
+    develop:
+      watch:
+        - action: rebuild
+          path: Dockerfile
+        - action: rebuild
+          path: src/
+        - action: rebuild
+          path: pyproject.toml
+        - action: rebuild
+          path: uv.lock
+        - action: sync+restart
+          path: compose-dev.yml
+          target: python-starter
+        - action: sync+restart
+          path: .env
+          target: python-starter
