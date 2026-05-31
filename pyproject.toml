@@ -15,6 +15,7 @@ classifiers = [
 dependencies = [
     "feedparser==6.0.12",
     "google-api-python-client==2.197.0",
+    "pydantic[timezone]==2.13.4",
     "python-dotenv==1.2.2",
 ]
 [project.urls]
