@@ -13,6 +13,9 @@ classifiers = [
     "Programming Language :: Python :: 3",
 ]
 dependencies = [
+    "feedparser==6.0.12",
+    "google-api-python-client==2.197.0",
+    "pydantic[timezone]==2.13.4",
     "python-dotenv==1.2.2",
 ]
 [project.urls]
@@ -22,7 +25,7 @@ Issues = "https://github.com/jnstockley/youtube-notify/issues"
 
 [dependency-groups]
 dev = [
-    "pytest>=8.3.5",
-    "pytest-cov>=6.0.0",
-    "ruff>=0.13.2",
+    "pytest>=9.0.3",
+    "pytest-cov>=7.1.0",
+    "ruff>=0.15.15",
 ]
