@@ -1,9 +1,9 @@
 [project]
-name = "js-python-starter"
+name = "youtube-notify"
 version = "0.1.0"
 description = "Add your description here"
 readme = "README.md"
-requires-python = ">=3.13, <4.0"
+requires-python = ">=3.14, <4.0"
 license-files = ["LICENSE"]
 authors = [
     { name = "Jack Stockley", email = "jack@jstockley.com"}
@@ -16,9 +16,9 @@ dependencies = [
     "python-dotenv==1.2.2",
 ]
 [project.urls]
-Homepage = "https://github.com/jnstockley/python-starter"
-Repository = "https://github.com/jnstockley/python-starter.git"
-Issues = "https://github.com/jnstockley/python-starter/issues"
+Homepage = "https://github.com/jnstockley/youtube-notify"
+Repository = "https://github.com/jnstockley/youtube-notify.git"
+Issues = "https://github.com/jnstockley/youtube-notify/issues"
 
 [dependency-groups]
 dev = [
