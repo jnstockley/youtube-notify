@@ -1,37 +1,160 @@
-# Python Starter
+# youtube-notify
 
-## Steps to set up
-1. Create a new repository in GitHub using this repository as a template
-2. Generate Docker Hub PAT (Personal Access Token)
-3. Create an [Environment in GitHub](https://docs.github.com/en/actions/managing-workflow-runs-and-deployments/managing-deployments/managing-environments-for-deployment#creating-an-environment) with the following secrets
-   - DOCKER_USERNAME (Docker Hub username)
-   - DOCKER_PASSWORD (Docker Hub PAT)
-4. Create a Docker Hub repository with the same name as the GitHub repository
-5. Update `assignees` in `renovate.json` with your GitHub username
-6. Set up code-cove and make sure it has access to this repository
-   - https://docs.codecov.com/docs/quick-start
-7. Setup branch protection rules
-   - Set `Enrforcment Status` to `Enabled`
-   - Make sure `Target branches` set to `main` or default branch
-   - Ensure these `Branch rules` are selected
-     - `Restrict deletions`
-     - `Require status checks to pass` with these checks
-       - `Lint`
-       - `Test`
-     - `Block force pushes`
-8. Create a PyPi `Trusted Publisher`
-   - https://pypi.org/manage/account/publishing/
-9. Ensure the name in `pyproject.toml` matches the name of the package on PyPi
-10. Make sure the following linters are installed externally of the project
-    - yamllint
-    - shellcheck
-    - shfmt
-    - node (npx/dclint)
+`youtube-notify` is a small Python library for fetching recent content from a YouTube channel. It prefers the channel RSS feed first and falls back to the YouTube Data API when RSS does not return content. The library returns typed `Content` models with channel metadata, timestamps, thumbnails, and descriptions.
 
-## TODO
-- [X] Handle GitHub pre-release
-- [X] Update PYTHONPATH with src folder
-- [X] Add custom user to Dockerfile
-- [ ] Fix Dockerfile
-- [ ] Fix health check
-- [ ] Fix version number
+## Features
+
+- RSS-first content retrieval with YouTube API fallback
+- Optional YouTube API key and OAuth helpers
+- Pydantic models for downstream validation and serialization
+- Async-friendly public APIs
+- Mocked integration tests for deterministic CI runs
+
+## Installation
+
+This repository uses a `src/` layout, so the simplest way to work with it directly is to clone the repo, install the dependencies, and run commands with `src/` on `PYTHONPATH`.
+
+```bash
+git clone https://github.com/jnstockley/youtube-notify.git
+cd youtube-notify
+uv sync
+export PYTHONPATH=src
+```
+
+If you are using another virtual environment tool, install the dependencies from `pyproject.toml` and make sure the project root is on your import path in the same way.
+
+## Setup
+
+1. Clone the repository.
+2. Create and activate a Python 3.14 environment.
+3. Install dependencies with `uv sync` or your preferred environment manager.
+4. Set `PYTHONPATH=src` when running the library directly from the repository.
+5. If you want to use the YouTube API fallback, provide an API key or OAuth credentials in your own application code.
+
+## Usage
+
+The main entry point is `content_fetcher.get_content(channel_id, youtube=None)`.
+It tries RSS first and only uses the YouTube API client if RSS returns no content.
+
+### Basic usage
+
+```python
+import asyncio
+
+from content_fetcher import get_content
+
+
+async def main() -> None:
+    content = await get_content("UCxxxxxxxxxxxxxxxxxxxxxx")
+    for item in content:
+        print(item.title)
+
+
+asyncio.run(main())
+```
+
+### Using a YouTube API key
+
+If you already have a YouTube Data API key, build a client with `youtube.auth.api_key.authenticate()` and pass it to `content_fetcher.get_content()`.
+
+```python
+import asyncio
+
+from content_fetcher import get_content
+from youtube.auth.api_key import authenticate
+
+
+async def main() -> None:
+    youtube = authenticate("YOUR_YOUTUBE_API_KEY")
+    content = await get_content("UCxxxxxxxxxxxxxxxxxxxxxx", youtube)
+    for item in content:
+        print(item.title)
+
+
+asyncio.run(main())
+```
+
+### Using OAuth credentials
+
+If you need OAuth-based access, the OAuth helper can build credentials and refresh them before creating the client.
+
+```python
+from youtube.auth.oauth import authenticate, device_code_flow
+
+
+creds = device_code_flow("YOUR_CLIENT_ID", "YOUR_CLIENT_SECRET")
+youtube = authenticate(creds)
+```
+
+## Required Environment Variables
+
+The library itself does not require API credentials from environment variables. The only runtime environment settings used by the code are for logging:
+
+- `LOG_LEVEL`: optional, defaults to `INFO`
+- `LOG_DIR`: optional, defaults to `../logs`
+
+The repository also includes `sample.env` with example values for a wrapper application:
+
+- `YOUTUBE_API_KEY`
+- `GOOGLE_CLIENT_ID`
+- `GOOGLE_CLIENT_SECRET`
+
+Those are not read automatically by the library; they are intended for your own application or deployment scripts.
+
+If your application uses the YouTube API path through `youtube.youtube.get_content()` or
+passes a client into `content_fetcher.get_content()`, you must provide one of the
+following sets of credentials in your application layer:
+
+- `YOUTUBE_API_KEY`
+- `GOOGLE_CLIENT_ID` and `GOOGLE_CLIENT_SECRET`
+
+## Development
+
+Common local commands:
+
+```bash
+uv run pytest
+uv run pytest -m integration
+uv run ruff check
+uv run ruff format --check
+```
+
+The integration test suite is mocked and does not make live network calls.
+
+## Project Structure
+
+- `src/content_fetcher.py`: top-level RSS-first content fetcher
+- `src/rss/rss.py`: RSS feed fetching and parsing
+- `src/youtube/youtube.py`: YouTube API fetching and parsing
+- `src/youtube/auth/`: API key and OAuth helpers
+- `src/models.py`: Pydantic models used across the library
+
+## Operational Notes
+
+- The library writes logs to `LOG_DIR/app.log`.
+- If you run the code in a container or read-only environment, set `LOG_DIR` to a writable path.
+- The public APIs are asynchronous, so call them from `asyncio` code or wrap them with `asyncio.run()`.
+
+## Contributing
+
+Contributions are expected to keep the repository green.
+
+Before opening a pull request:
+
+- All tests must pass.
+- Code coverage for updated code should be at least 90%.
+- The existing linting steps must pass.
+- Any public behavior change should include matching tests.
+
+Recommended validation commands:
+
+```bash
+uv run pytest
+uv run pytest --cov src --cov-branch --cov-report=term-missing
+uv run ruff check
+uv run ruff format --check
+```
+
+## License
+
+This project is licensed under the GNU General Public License v3.0. See the `LICENSE` file for details.

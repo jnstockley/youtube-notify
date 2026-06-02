@@ -1,16 +1,23 @@
 [project]
 name = "youtube-notify"
 version = "0.1.0"
-description = "Add your description here"
+description = "Fetches new YouTube channel playlist content from RSS with automatic fallback to the YouTube API."
 readme = "README.md"
 requires-python = ">=3.14, <4.0"
 license-files = ["LICENSE"]
 authors = [
     { name = "Jack Stockley", email = "jack@jstockley.com"}
 ]
-keywords = ["starter", "template", "python"]
+keywords = ["youtube", "notifications", "pydantic", "feedparser", "rss", "google-api-python-client"]
 classifiers = [
     "Programming Language :: Python :: 3",
+    "Framework :: Pydantic :: 2",
+    "Framework :: Pytest",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
+    "Natural Language :: English",
+    "Operating System :: OS Independent",
+    "Topic :: Internet :: WWW/HTTP :: Dynamic Content"
 ]
 dependencies = [
     "feedparser==6.0.12",
@@ -28,4 +35,9 @@ dev = [
     "pytest>=9.0.3",
     "pytest-cov>=7.1.0",
     "ruff>=0.15.15",
+]
+
+[tool.pytest.ini_options]
+markers = [
+    "integration: live tests that hit YouTube endpoints",
 ]
