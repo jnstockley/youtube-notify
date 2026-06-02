@@ -3,7 +3,11 @@
   "name": "Main Branch Protection",
   "target": "branch",
   "source_type": "Repository",
+<<<<<<< HEAD
   "source": "jnstockley/youtube-notify",
+=======
+  "source": "jnstockley/python-starter",
+>>>>>>> external/main
   "enforcement": "active",
   "conditions": {
     "ref_name": {
