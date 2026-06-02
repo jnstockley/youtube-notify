@@ -8,9 +8,16 @@ license-files = ["LICENSE"]
 authors = [
     { name = "Jack Stockley", email = "jack@jstockley.com"}
 ]
-keywords = ["starter", "template", "python"]
+keywords = ["youtube", "notifications", "pydantic", "feedparser", "rss", "google-api-python-client"]
 classifiers = [
     "Programming Language :: Python :: 3",
+    "Framework :: Pydantic :: 2",
+    "Framework :: Pytest",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
+    "Natural Language :: English",
+    "Operating System :: OS Independent",
+    "Topic :: Internet :: WWW/HTTP :: Dynamic Content"
 ]
 dependencies = [
     "feedparser==6.0.12",
