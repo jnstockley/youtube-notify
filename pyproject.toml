@@ -1,17 +1,9 @@
 [project]
-name = "better-social-notifications"
+name = "youtube-notify"
 version = "0.1.0"
-description = ""
+description = "Add your description here"
 readme = "README.md"
-requires-python = ">=3.14, <3.15"
-dependencies = [
-    "aiohttp==3.13.5",
-    "apprise==1.11.0",
-    "google-api-python-client==2.197.0",
-    "python-dotenv==1.2.2",
-    "pytz==2026.2",
-    "sqlalchemy==2.0.50",
-]
+requires-python = ">=3.14, <4.0"
 license-files = ["LICENSE"]
 authors = [
     { name = "Jack Stockley", email = "jack@jstockley.com"}
@@ -20,14 +12,20 @@ keywords = ["starter", "template", "python"]
 classifiers = [
     "Programming Language :: Python :: 3",
 ]
+dependencies = [
+    "feedparser==6.0.12",
+    "google-api-python-client==2.197.0",
+    "pydantic[timezone]==2.13.4",
+    "python-dotenv==1.2.2",
+]
 [project.urls]
-Homepage = "https://github.com/jnstockley/python-starter"
-Repository = "https://github.com/jnstockley/python-starter.git"
-Issues = "https://github.com/jnstockley/python-starter/issues"
+Homepage = "https://github.com/jnstockley/youtube-notify"
+Repository = "https://github.com/jnstockley/youtube-notify.git"
+Issues = "https://github.com/jnstockley/youtube-notify/issues"
 
 [dependency-groups]
 dev = [
-    "pytest>=8.3.5",
-    "pytest-cov>=6.0.0",
-    "ruff>=0.13.2",
+    "pytest>=9.0.3",
+    "pytest-cov>=7.1.0",
+    "ruff>=0.15.15",
 ]
