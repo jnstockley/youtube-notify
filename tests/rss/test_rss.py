@@ -98,7 +98,7 @@ def test_get_feed_builds_user_agent_and_returns_feed(
     response = SimpleNamespace(status=200)
     parse = Mock(return_value=response)
     monkeypatch.setattr(rss_module.feedparser, "parse", parse)
-    monkeypatch.setattr(rss_module.metadata, "version", lambda name: "1.2.3")
+    monkeypatch.setattr(rss_module, "get_version", lambda: "1.2.3")
 
     result = rss_module.__get_feed("playlist-123")
 
@@ -112,7 +112,7 @@ def test_get_feed_builds_user_agent_and_returns_feed(
 def test_get_feed_raises_for_non_200_status(monkeypatch: pytest.MonkeyPatch) -> None:
     response = SimpleNamespace(status=404)
     monkeypatch.setattr(rss_module.feedparser, "parse", Mock(return_value=response))
-    monkeypatch.setattr(rss_module.metadata, "version", lambda name: "1.2.3")
+    monkeypatch.setattr(rss_module, "get_version", lambda: "1.2.3")
 
     with pytest.raises(HTTPError, match="Status code: 404"):
         rss_module.__get_feed("playlist-123")
