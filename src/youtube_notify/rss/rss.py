@@ -47,7 +47,10 @@ async def __fetch_and_parse_feed(playlist_id: str) -> set[Content]:
     Returns:
         A set of parsed `Content` objects from the feed.
     """
-    feed = await asyncio.to_thread(__get_feed, playlist_id)
+    try:
+        feed = await asyncio.to_thread(__get_feed, playlist_id)
+    except HTTPError:
+        return set()
     return await asyncio.to_thread(__parse_feed, feed)
 
 
