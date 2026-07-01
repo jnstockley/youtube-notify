@@ -4,7 +4,7 @@ import asyncio
 
 import pytest
 
-from youtube import youtube as youtube_module
+from youtube_notify.youtube import youtube as youtube_module
 
 pytestmark = pytest.mark.integration
 

@@ -3,7 +3,7 @@ from datetime import datetime, timezone
 import pytest
 from pydantic import ValidationError, HttpUrl
 
-from models import Channel, Content, ContentType
+from youtube_notify.models import Channel, Content, ContentType
 
 
 def test_channel_repr_and_validation() -> None:

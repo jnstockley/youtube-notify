@@ -3,7 +3,7 @@ from unittest.mock import AsyncMock
 
 import pytest
 
-import content_fetcher
+from youtube_notify import content_fetcher
 
 
 def test_get_content_returns_rss_content_without_fallback(

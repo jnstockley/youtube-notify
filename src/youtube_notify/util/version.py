@@ -1,5 +1,5 @@
-from importlib import metadata
 import tomllib
+from importlib import metadata
 from pathlib import Path
 
 
@@ -13,7 +13,7 @@ def get_version() -> str:
         pass
 
     try:
-        pyproject_path = Path(__file__).parent.parent.parent / "pyproject.toml"
+        pyproject_path = Path(__file__).resolve().parents[3] / "pyproject.toml"
         with open(pyproject_path, "rb") as f:
             data = tomllib.load(f)
         return data["project"]["version"]

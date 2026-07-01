@@ -12,16 +12,15 @@
 
 ## Installation
 
-This repository uses a `src/` layout, so the simplest way to work with it directly is to clone the repo, install the dependencies, and run commands with `src/` on `PYTHONPATH`.
+This repository uses a `src/` layout and installs as the `youtube_notify` package.
 
 ```bash
 git clone https://github.com/jnstockley/youtube-notify.git
 cd youtube-notify
 uv sync
-export PYTHONPATH=src
 ```
 
-If you are using another virtual environment tool, install the dependencies from `pyproject.toml` and make sure the project root is on your import path in the same way.
+If you are using another virtual environment tool, install the project from `pyproject.toml` so the package is available as `youtube_notify`.
 
 ## Setup
 
@@ -33,7 +32,7 @@ If you are using another virtual environment tool, install the dependencies from
 
 ## Usage
 
-The main entry point is `content_fetcher.get_content(channel_id, youtube=None)`.
+The main entry point is `youtube_notify.get_content(channel_id, youtube=None)`.
 It tries RSS first and only uses the YouTube API client if RSS returns no content.
 
 ### Basic usage
@@ -41,7 +40,7 @@ It tries RSS first and only uses the YouTube API client if RSS returns no conten
 ```python
 import asyncio
 
-from content_fetcher import get_content
+from youtube_notify import get_content
 
 
 async def main() -> None:
@@ -55,13 +54,13 @@ asyncio.run(main())
 
 ### Using a YouTube API key
 
-If you already have a YouTube Data API key, build a client with `youtube.auth.api_key.authenticate()` and pass it to `content_fetcher.get_content()`.
+If you already have a YouTube Data API key, build a client with `youtube_notify.youtube.auth.api_key.authenticate()` and pass it to `youtube_notify.get_content()`.
 
 ```python
 import asyncio
 
-from content_fetcher import get_content
-from youtube.auth.api_key import authenticate
+from youtube_notify import get_content
+from youtube_notify.youtube.auth.api_key import authenticate
 
 
 async def main() -> None:
@@ -79,7 +78,7 @@ asyncio.run(main())
 If you need OAuth-based access, the OAuth helper can build credentials and refresh them before creating the client.
 
 ```python
-from youtube.auth.oauth import authenticate, device_code_flow
+from youtube_notify.youtube.auth.oauth import authenticate, device_code_flow
 
 
 creds = device_code_flow("YOUR_CLIENT_ID", "YOUR_CLIENT_SECRET")
@@ -101,8 +100,8 @@ The repository also includes `sample.env` with example values for a wrapper appl
 
 Those are not read automatically by the library; they are intended for your own application or deployment scripts.
 
-If your application uses the YouTube API path through `youtube.youtube.get_content()` or
-passes a client into `content_fetcher.get_content()`, you must provide one of the
+If your application uses the YouTube API path through `youtube_notify.youtube.get_content()` or
+passes a client into `youtube_notify.get_content()`, you must provide one of the
 following sets of credentials in your application layer:
 
 - `YOUTUBE_API_KEY`
@@ -123,11 +122,11 @@ The integration test suite is mocked and does not make live network calls.
 
 ## Project Structure
 
-- `src/content_fetcher.py`: top-level RSS-first content fetcher
-- `src/rss/rss.py`: RSS feed fetching and parsing
-- `src/youtube/youtube.py`: YouTube API fetching and parsing
-- `src/youtube/auth/`: API key and OAuth helpers
-- `src/models.py`: Pydantic models used across the library
+- `src/youtube_notify/content_fetcher.py`: top-level RSS-first content fetcher
+- `src/youtube_notify/rss/rss.py`: RSS feed fetching and parsing
+- `src/youtube_notify/youtube/youtube.py`: YouTube API fetching and parsing
+- `src/youtube_notify/youtube/auth/`: API key and OAuth helpers
+- `src/youtube_notify/models.py`: Pydantic models used across the library
 
 ## Operational Notes
 

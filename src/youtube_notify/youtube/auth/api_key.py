@@ -1,7 +1,8 @@
+from googleapiclient.discovery import Resource
 import googleapiclient.discovery
 
 
-def authenticate(api_key: str) -> googleapiclient.Resource:
+def authenticate(api_key: str) -> Resource:
     """Build and return a YouTube Data API client using an API key.
 
     Args:

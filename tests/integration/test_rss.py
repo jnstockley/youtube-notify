@@ -4,7 +4,7 @@ import asyncio
 
 import pytest
 
-from rss import rss as rss_module
+from youtube_notify.rss import rss as rss_module
 
 pytestmark = pytest.mark.integration
 
