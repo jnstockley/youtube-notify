@@ -2,13 +2,13 @@ import time
 from datetime import datetime, timezone
 from time import monotonic, sleep
 
-import requests
-
-from util.logging import logger
-
 import googleapiclient.discovery
+import requests
 from google.auth.transport.requests import Request
 from google.oauth2.credentials import Credentials
+from googleapiclient.discovery import Resource
+
+from ...util.logging import logger
 
 __DEVICE_AUTH_URL = "https://oauth2.googleapis.com/device/code"
 __TOKEN_URL = "https://oauth2.googleapis.com/token"
@@ -124,7 +124,7 @@ def device_code_flow(
     return creds
 
 
-def authenticate(creds: Credentials) -> googleapiclient.Resource:
+def authenticate(creds: Credentials) -> Resource:
     """Build and return a YouTube Data API client from OAuth credentials.
 
     If the credentials are close to expiry, they are refreshed before the

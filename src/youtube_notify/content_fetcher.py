@@ -1,9 +1,9 @@
 from googleapiclient.discovery import Resource
 
-import rss.rss as rss_module
-import youtube.youtube as youtube_module
-from models import Content
-from util.logging import logger
+from .models import Content
+from .rss import rss as rss_module
+from .util.logging import logger
+from .youtube import youtube as youtube_module
 
 
 async def get_content(channel_id: str, youtube: Resource | None = None) -> set[Content]:

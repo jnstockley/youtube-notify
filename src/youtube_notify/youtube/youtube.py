@@ -4,9 +4,9 @@ from datetime import datetime
 from googleapiclient.discovery import Resource
 from pydantic import HttpUrl
 
-from models import Content, ContentType, Channel
-from util.logging import logger
-from util.youtube import get_content_type, channel_id_to_playlist_ids
+from ..models import Channel, Content, ContentType
+from ..util.logging import logger
+from ..util.youtube import channel_id_to_playlist_ids, get_content_type
 
 
 async def get_content(channel_id: str, youtube: Resource) -> set[Content]:

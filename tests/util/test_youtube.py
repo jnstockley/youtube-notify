@@ -1,7 +1,7 @@
 import pytest
 
-from models import ContentType
-from util.youtube import channel_id_to_playlist_ids, get_content_type
+from youtube_notify.models import ContentType
+from youtube_notify.util.youtube import channel_id_to_playlist_ids, get_content_type
 
 
 @pytest.mark.parametrize(

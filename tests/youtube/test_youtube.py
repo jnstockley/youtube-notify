@@ -4,8 +4,8 @@ from unittest.mock import Mock
 
 import pytest
 
-import youtube.youtube as youtube_module
-from models import Channel, Content, ContentType
+from youtube_notify.models import Channel, Content, ContentType
+from youtube_notify.youtube import youtube as youtube_module
 
 
 def _api_item(

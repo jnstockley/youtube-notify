@@ -1,5 +1,5 @@
-from models import ContentType
-from util.logging import logger
+from ..models import ContentType
+from .logging import logger
 
 
 def get_content_type(playlist_id: str) -> ContentType:

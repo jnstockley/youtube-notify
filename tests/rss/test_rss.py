@@ -7,8 +7,8 @@ from unittest.mock import Mock
 import pytest
 from requests import HTTPError
 
-import rss.rss as rss_module
-from models import Channel, ContentType
+from youtube_notify.models import Channel, ContentType
+from youtube_notify.rss import rss as rss_module
 
 
 def _feed_entry(video_id: str) -> SimpleNamespace:

@@ -1,6 +1,6 @@
 from unittest.mock import Mock
 
-import youtube.auth.api_key as api_key_module
+import youtube_notify.youtube.auth.api_key as api_key_module
 
 
 def test_authenticate_builds_youtube_client(monkeypatch) -> None:

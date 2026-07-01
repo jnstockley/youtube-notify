@@ -1,22 +1,17 @@
 from __future__ import annotations
 
 import os
-import sys
 from datetime import datetime, timezone
 from pathlib import Path
-
-from rss import rss as rss_module
-from util.youtube import channel_id_to_playlist_ids
-from youtube import youtube as youtube_module
 
 import feedparser
 import pytest
 
-SRC_DIR = Path(__file__).resolve().parents[2] / "src"
-if str(SRC_DIR) not in sys.path:
-    sys.path.insert(0, str(SRC_DIR))
-
 os.environ["LOG_DIR"] = str(Path(__file__).resolve().parents[2] / "logs")
+
+from youtube_notify.rss import rss as rss_module
+from youtube_notify.util.youtube import channel_id_to_playlist_ids
+from youtube_notify.youtube import youtube as youtube_module
 
 INTEGRATION_CHANNEL_ID = "UC1234567890ABCDEFXYZ12"
 CHANNEL_TITLE = "Example Channel"

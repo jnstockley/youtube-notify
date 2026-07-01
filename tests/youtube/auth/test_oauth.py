@@ -3,8 +3,9 @@ from unittest.mock import Mock
 
 import pytest
 import requests
-import youtube.auth.oauth as oauth_module
 from google.oauth2.credentials import Credentials
+
+import youtube_notify.youtube.auth.oauth as oauth_module
 
 
 class FakeResponse:
