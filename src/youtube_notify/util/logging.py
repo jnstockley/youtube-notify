@@ -4,9 +4,7 @@ from pathlib import Path
 
 log_level = os.getenv("LOG_LEVEL", "INFO").upper()
 
-log_dir = Path(
-    os.getenv("LOG_DIR", str(Path(__file__).resolve().parents[3] / "logs"))
-)
+log_dir = Path(os.getenv("LOG_DIR", str(Path(__file__).resolve().parents[3] / "logs")))
 log_dir.mkdir(parents=True, exist_ok=True)
 
 
