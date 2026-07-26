@@ -30,12 +30,6 @@ def test_get_content_merges_playlist_results(monkeypatch: pytest.MonkeyPatch) ->
         def __init__(self) -> None:
             self.headers: dict[str, str] = {}
 
-        async def __aenter__(self) -> object:
-            return self
-
-        async def __aexit__(self, *args: object) -> None:
-            return None
-
     async def fake_fetch_and_parse_feed(playlist_id: str, client: object) -> set[str]:
         seen.append((playlist_id, client))
         return {playlist_id}

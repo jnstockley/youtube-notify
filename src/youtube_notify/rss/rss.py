@@ -34,13 +34,12 @@ async def get_content(channel_id: str, client: httpx.AsyncClient) -> set[Content
     user_agent = f"youtube-notify/{get_version()}"
     client.headers.update({"User-Agent": user_agent})
 
-    async with client:
-        tasks: list[asyncio.Task[set[Content]]] = []
-        async with asyncio.TaskGroup() as task_group:
-            for playlist_id in playlist_ids:
-                tasks.append(
-                    task_group.create_task(__fetch_and_parse_feed(playlist_id, client))
-                )
+    tasks: list[asyncio.Task[set[Content]]] = []
+    async with asyncio.TaskGroup() as task_group:
+        for playlist_id in playlist_ids:
+            tasks.append(
+                task_group.create_task(__fetch_and_parse_feed(playlist_id, client))
+            )
 
     content: set[Content] = set()
     for task in tasks:
