@@ -16,7 +16,7 @@ RSS_FEED_URL = "https://www.youtube.com/feeds/videos.xml?playlist_id={}"
 RSS_FEED_TIMEOUT_SECONDS = 10.0
 
 
-async def get_content(channel_id: str) -> set[Content]:
+async def get_content(channel_id: str, client: httpx.AsyncClient) -> set[Content]:
     """Fetch and merge playlist feeds using one pooled asynchronous HTTP client.
 
     This is an opt-in alternative to :func:`get_content` for callers that want
@@ -25,14 +25,16 @@ async def get_content(channel_id: str) -> set[Content]:
 
     Args:
         channel_id: YouTube channel identifier used to derive playlist IDs.
+        client: YouTube client object.
 
     Returns:
         A deduplicated set of parsed ``Content`` objects.
     """
     playlist_ids = channel_id_to_playlist_ids(channel_id)
     user_agent = f"youtube-notify/{get_version()}"
+    client.headers.update({"User-Agent": user_agent})
 
-    async with httpx.AsyncClient(headers={"User-Agent": user_agent}) as client:
+    async with client:
         tasks: list[asyncio.Task[set[Content]]] = []
         async with asyncio.TaskGroup() as task_group:
             for playlist_id in playlist_ids:

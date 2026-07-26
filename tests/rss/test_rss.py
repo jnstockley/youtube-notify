@@ -25,9 +25,11 @@ def _feed_entry(video_id: str) -> SimpleNamespace:
 def test_get_content_merges_playlist_results(monkeypatch: pytest.MonkeyPatch) -> None:
     playlist_ids = ["playlist-1", "playlist-2", "playlist-3"]
     seen: list[tuple[str, object]] = []
-    clients: list[object] = []
 
     class FakeAsyncClient:
+        def __init__(self) -> None:
+            self.headers: dict[str, str] = {}
+
         async def __aenter__(self) -> object:
             return self
 
@@ -38,22 +40,17 @@ def test_get_content_merges_playlist_results(monkeypatch: pytest.MonkeyPatch) ->
         seen.append((playlist_id, client))
         return {playlist_id}
 
-    def fake_async_client(*args: object, **kwargs: object) -> FakeAsyncClient:
-        client = FakeAsyncClient()
-        clients.append(client)
-        return client
-
     monkeypatch.setattr(
         rss_module, "channel_id_to_playlist_ids", lambda channel_id: playlist_ids
     )
-    monkeypatch.setattr(rss_module.httpx, "AsyncClient", fake_async_client)
     monkeypatch.setattr(rss_module, "__fetch_and_parse_feed", fake_fetch_and_parse_feed)
 
-    result = asyncio.run(rss_module.get_content("channel-123"))
+    client = FakeAsyncClient()
+    result = asyncio.run(rss_module.get_content("channel-123", client))
 
     assert result == set(playlist_ids)
-    assert len(clients) == 1
-    assert seen == [(playlist_id, clients[0]) for playlist_id in playlist_ids]
+    assert client.headers == {"User-Agent": "youtube-notify/0.1.0"}
+    assert seen == [(playlist_id, client) for playlist_id in playlist_ids]
 
 
 def test_fetch_and_parse_feed_uses_feed_getter_and_parses_directly(
