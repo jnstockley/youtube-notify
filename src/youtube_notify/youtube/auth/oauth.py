@@ -1,5 +1,5 @@
 import time
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from time import monotonic, sleep
 
 import googleapiclient.discovery
@@ -107,7 +107,7 @@ def device_code_flow(
     expires_in_secs = token_data.get("expires_in")
     if expires_in_secs is not None:
         expiry_dt = datetime.fromtimestamp(
-            time.time() + int(expires_in_secs), tz=timezone.utc
+            time.time() + int(expires_in_secs), tz=UTC
         ).replace(tzinfo=None)  # store as naive UTC to match SQLAlchemy convention
 
     creds = Credentials(
@@ -190,9 +190,9 @@ def __is_expired(creds: Credentials) -> bool:
     expiry = creds.expiry
     # Normalize to UTC-aware datetime for comparison.
     if expiry.tzinfo is None:
-        expiry = expiry.replace(tzinfo=timezone.utc)
+        expiry = expiry.replace(tzinfo=UTC)
 
-    now = datetime.now(tz=timezone.utc)
+    now = datetime.now(tz=UTC)
     seconds_remaining = (expiry - now).total_seconds()
     logger.debug(
         "OAuth credential expiry check: expiry=%s, seconds_remaining=%.0f",

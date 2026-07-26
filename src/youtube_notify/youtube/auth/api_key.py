@@ -1,5 +1,5 @@
-from googleapiclient.discovery import Resource
 import googleapiclient.discovery
+from googleapiclient.discovery import Resource
 
 
 def authenticate(api_key: str) -> Resource:

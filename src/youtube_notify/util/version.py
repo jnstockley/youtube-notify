@@ -2,7 +2,6 @@ import tomllib
 from importlib import metadata
 from pathlib import Path
 
-
 PACKAGE_NAME = "youtube-notify"
 
 

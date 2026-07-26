@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 from unittest.mock import Mock
 
 import pytest
@@ -127,7 +127,7 @@ def test_authenticate_refreshes_expired_credentials(
         client_id="client-id",
         client_secret="client-secret",
         scopes=["scope"],
-        expiry=datetime.now(timezone.utc) - timedelta(minutes=10),
+        expiry=datetime.now(UTC) - timedelta(minutes=10),
     )
     refreshed = Credentials(
         token="new-token",
@@ -136,7 +136,7 @@ def test_authenticate_refreshes_expired_credentials(
         client_id="client-id",
         client_secret="client-secret",
         scopes=["scope"],
-        expiry=datetime.now(timezone.utc) + timedelta(hours=1),
+        expiry=datetime.now(UTC) + timedelta(hours=1),
     )
     build = Mock(return_value={"client": "youtube"})
     monkeypatch.setattr(oauth_module, "__is_expired", lambda _: True)
@@ -159,7 +159,7 @@ def test_authenticate_skips_refresh_for_valid_credentials(
         client_id="client-id",
         client_secret="client-secret",
         scopes=["scope"],
-        expiry=datetime.now(timezone.utc) + timedelta(hours=1),
+        expiry=datetime.now(UTC) + timedelta(hours=1),
     )
     build = Mock(return_value={"client": "youtube"})
     monkeypatch.setattr(oauth_module, "__is_expired", lambda _: False)
@@ -172,7 +172,7 @@ def test_authenticate_skips_refresh_for_valid_credentials(
 
 
 def test_is_expired_handles_all_cases() -> None:
-    now = datetime.now(timezone.utc)
+    now = datetime.now(UTC)
     valid = Credentials(
         token="token",
         refresh_token=None,
@@ -198,7 +198,7 @@ def test_is_expired_handles_all_cases() -> None:
         client_id="client-id",
         client_secret="client-secret",
         scopes=["scope"],
-        expiry=(datetime.now(timezone.utc) - timedelta(minutes=1)).replace(tzinfo=None)
+        expiry=(datetime.now(UTC) - timedelta(minutes=1)).replace(tzinfo=None)
         + timedelta(minutes=4),
     )
     no_expiry = Credentials(

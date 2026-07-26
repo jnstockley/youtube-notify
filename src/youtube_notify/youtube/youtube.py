@@ -101,7 +101,7 @@ def __parse_api_response(items: list[dict]) -> set[Content]:
         if item["status"]["privacyStatus"] == "public":
             title = item["snippet"]["title"]
             published_at = datetime.fromisoformat(
-                item["snippet"]["publishedAt"].replace("Z", "+00:00")
+                item["snippet"]["publishedAt"]
             ).astimezone()
             thumbnail_url = HttpUrl(item["snippet"]["thumbnails"]["maxres"]["url"])
             description = item["snippet"]["description"]

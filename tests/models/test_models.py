@@ -1,7 +1,7 @@
-from datetime import datetime, timezone
+from datetime import datetime
 
 import pytest
-from pydantic import ValidationError, HttpUrl
+from pydantic import HttpUrl, ValidationError
 
 from youtube_notify.models import Channel, Content, ContentType
 
@@ -22,7 +22,8 @@ def test_channel_repr_and_validation() -> None:
 
 def test_content_repr_hashability_and_validation() -> None:
     channel = Channel(id="channel-123", name="Example Channel")
-    published_at = datetime(2026, 5, 30, 17, 28, 38, tzinfo=timezone.utc)
+    local_tz = datetime.now().astimezone().tzinfo
+    published_at = datetime(2026, 5, 30, 17, 28, 38, tzinfo=local_tz)
     content = Content(
         id="video-123",
         title="Launch Video",
@@ -34,7 +35,7 @@ def test_content_repr_hashability_and_validation() -> None:
     )
 
     assert repr(content).startswith(
-        "Content(id=video-123, title=Launch Video, published_at=2026-05-30 17:28:38+00:00"
+        f"Content(id=video-123, title=Launch Video, published_at={published_at}"
     )
     assert len({content, content}) == 1
 
@@ -43,7 +44,7 @@ def test_content_repr_hashability_and_validation() -> None:
             {
                 "id": "video-123",
                 "title": "Launch Video",
-                "published_at": datetime(2026, 5, 30, 17, 28, 38),
+                "published_at": published_at.replace(tzinfo=None),
                 "thumbnail_url": HttpUrl(
                     "https://i.ytimg.com/vi/video-123/maxresdefault.jpg"
                 ),
