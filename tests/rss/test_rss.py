@@ -5,7 +5,6 @@ from types import SimpleNamespace
 from unittest.mock import Mock
 
 import pytest
-from requests import HTTPError
 
 from youtube_notify.models import Channel, ContentType
 from youtube_notify.rss import rss as rss_module
@@ -25,24 +24,39 @@ def _feed_entry(video_id: str) -> SimpleNamespace:
 
 def test_get_content_merges_playlist_results(monkeypatch: pytest.MonkeyPatch) -> None:
     playlist_ids = ["playlist-1", "playlist-2", "playlist-3"]
-    seen: list[str] = []
+    seen: list[tuple[str, object]] = []
+    clients: list[object] = []
 
-    async def fake_fetch_and_parse_feed(playlist_id: str) -> set[str]:
-        seen.append(playlist_id)
+    class FakeAsyncClient:
+        async def __aenter__(self) -> object:
+            return self
+
+        async def __aexit__(self, *args: object) -> None:
+            return None
+
+    async def fake_fetch_and_parse_feed(playlist_id: str, client: object) -> set[str]:
+        seen.append((playlist_id, client))
         return {playlist_id}
+
+    def fake_async_client(*args: object, **kwargs: object) -> FakeAsyncClient:
+        client = FakeAsyncClient()
+        clients.append(client)
+        return client
 
     monkeypatch.setattr(
         rss_module, "channel_id_to_playlist_ids", lambda channel_id: playlist_ids
     )
+    monkeypatch.setattr(rss_module.httpx, "AsyncClient", fake_async_client)
     monkeypatch.setattr(rss_module, "__fetch_and_parse_feed", fake_fetch_and_parse_feed)
 
     result = asyncio.run(rss_module.get_content("channel-123"))
 
     assert result == set(playlist_ids)
-    assert seen == playlist_ids
+    assert len(clients) == 1
+    assert seen == [(playlist_id, clients[0]) for playlist_id in playlist_ids]
 
 
-def test_fetch_and_parse_feed_uses_to_thread_twice(
+def test_fetch_and_parse_feed_uses_feed_getter_and_parses_directly(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     calls: list[tuple[str, tuple[object, ...]]] = []
@@ -51,24 +65,76 @@ def test_fetch_and_parse_feed_uses_to_thread_twice(
     )
     expected = {"parsed"}
 
-    def fake_get_feed(playlist_id: str) -> object:
+    async def fake_get_feed(playlist_id: str, client: object) -> object:
+        calls.append(("get_feed", (playlist_id, client)))
         return feed
 
     def fake_parse_feed(value: object) -> set[str]:
         return expected
 
-    async def fake_to_thread(fn, *args):
-        calls.append((fn.__name__, args))
-        return fn(*args)
-
     monkeypatch.setattr(rss_module, "__get_feed", fake_get_feed)
     monkeypatch.setattr(rss_module, "__parse_feed", fake_parse_feed)
-    monkeypatch.setattr(rss_module.asyncio, "to_thread", fake_to_thread)
 
-    result = asyncio.run(rss_module.__fetch_and_parse_feed("playlist-1"))
+    client = object()
+    result = asyncio.run(rss_module.__fetch_and_parse_feed("playlist-1", client))
 
     assert result == expected
-    assert calls == [("fake_get_feed", ("playlist-1",)), ("fake_parse_feed", (feed,))]
+    assert calls == [("get_feed", ("playlist-1", client))]
+
+
+def test_get_feed_downloads_and_parses_response(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    playlist_id = "UULF123"
+    url = "https://www.youtube.com/feeds/videos.xml?playlist_id=UULF123"
+    parsed_feed = SimpleNamespace(href=None)
+    parse = Mock(return_value=parsed_feed)
+    calls: list[tuple[object, tuple[object, ...], dict[str, object]]] = []
+
+    class FakeResponse:
+        content = b"<feed />"
+
+        def __init__(self, response_url: str) -> None:
+            self.url = response_url
+
+        def raise_for_status(self) -> None:
+            return None
+
+    class FakeAsyncClient:
+        async def get(self, value: str, *, timeout: float) -> FakeResponse:
+            assert value == url
+            assert timeout == rss_module.RSS_FEED_TIMEOUT_SECONDS
+            return FakeResponse(url)
+
+    async def fake_to_thread(fn, *args, **kwargs):
+        calls.append((fn, args, kwargs))
+        return fn(*args, **kwargs)
+
+    monkeypatch.setattr(rss_module.feedparser, "parse", parse)
+    monkeypatch.setattr(rss_module.asyncio, "to_thread", fake_to_thread)
+
+    result = asyncio.run(rss_module.__get_feed(playlist_id, FakeAsyncClient()))
+
+    assert result is parsed_feed
+    assert parsed_feed.href == url
+    assert calls == [
+        (
+            parse,
+            (b"<feed />",),
+            {"response_headers": {"content-location": url}},
+        )
+    ]
+
+
+def test_get_feed_returns_none_when_request_times_out() -> None:
+    class FailingAsyncClient:
+        async def get(self, value: str, *, timeout: float) -> None:
+            assert timeout == rss_module.RSS_FEED_TIMEOUT_SECONDS
+            raise rss_module.httpx.ReadTimeout("request timed out")
+
+    result = asyncio.run(rss_module.__get_feed("UULF123", FailingAsyncClient()))
+
+    assert result is None
 
 
 def test_parse_feed_parses_entries_into_content() -> None:
@@ -90,29 +156,3 @@ def test_parse_feed_parses_entries_into_content() -> None:
     assert content.description == "A sample description."
     assert content.content_type is ContentType.VIDEO
     assert content.channel == Channel(id="channel-123", name="Example Channel")
-
-
-def test_get_feed_builds_user_agent_and_returns_feed(
-    monkeypatch: pytest.MonkeyPatch,
-) -> None:
-    response = SimpleNamespace(status=200)
-    parse = Mock(return_value=response)
-    monkeypatch.setattr(rss_module.feedparser, "parse", parse)
-    monkeypatch.setattr(rss_module, "get_version", lambda: "1.2.3")
-
-    result = rss_module.__get_feed("playlist-123")
-
-    assert result is response
-    parse.assert_called_once_with(
-        "https://www.youtube.com/feeds/videos.xml?playlist_id=playlist-123",
-        agent="youtube-notify/1.2.3",
-    )
-
-
-def test_get_feed_raises_for_non_200_status(monkeypatch: pytest.MonkeyPatch) -> None:
-    response = SimpleNamespace(status=404)
-    monkeypatch.setattr(rss_module.feedparser, "parse", Mock(return_value=response))
-    monkeypatch.setattr(rss_module, "get_version", lambda: "1.2.3")
-
-    with pytest.raises(HTTPError, match="Status code: 404"):
-        rss_module.__get_feed("playlist-123")

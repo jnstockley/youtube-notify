@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import os
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 
 import feedparser
@@ -15,7 +15,7 @@ from youtube_notify.youtube import youtube as youtube_module
 
 INTEGRATION_CHANNEL_ID = "UC1234567890ABCDEFXYZ12"
 CHANNEL_TITLE = "Example Channel"
-PUBLISHED_AT = datetime(2026, 5, 30, 17, 28, 38, tzinfo=timezone.utc)
+PUBLISHED_AT = datetime(2026, 5, 30, 17, 28, 38, tzinfo=UTC)
 
 
 def _build_rss_feed(playlist_id: str, video_id: str) -> feedparser.FeedParserDict:
@@ -102,7 +102,9 @@ def mock_external_youtube_calls(
     mock_rss_feeds: dict[str, feedparser.FeedParserDict],
     mock_youtube_items: dict[str, list[dict]],
 ) -> None:
-    def fake_get_feed(playlist_id: str) -> feedparser.FeedParserDict:
+    async def fake_get_feed(
+        playlist_id: str, client: object
+    ) -> feedparser.FeedParserDict:
         return mock_rss_feeds[playlist_id]
 
     def fake_get_api_response(playlist_id: str, youtube: object) -> list[dict]:
