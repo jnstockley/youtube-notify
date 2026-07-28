@@ -20,8 +20,9 @@ classifiers = [
     "Topic :: Internet :: WWW/HTTP :: Dynamic Content"
 ]
 dependencies = [
-    "feedparser==6.0.12",
+    "feedparser==6.0.13",
     "google-api-python-client==2.198.0",
+    "httpx==0.28.1",
     "pydantic[timezone]==2.13.4",
     "python-dotenv==1.2.2",
 ]

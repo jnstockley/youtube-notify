@@ -1,5 +1,5 @@
 import asyncio
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from unittest.mock import Mock
 
 import pytest
@@ -39,7 +39,7 @@ def test_get_content_merges_results_and_deduplicates(
     expected = Content(
         id="video-123",
         title="Launch Video",
-        published_at=datetime(2026, 5, 30, 17, 28, 38, tzinfo=timezone.utc),
+        published_at=datetime(2026, 5, 30, 17, 28, 38, tzinfo=UTC),
         thumbnail_url="https://i.ytimg.com/vi/video-123/maxresdefault.jpg",
         description="A sample description.",
         content_type=ContentType.VIDEO,
@@ -79,7 +79,7 @@ def test_fetch_and_parse_api_response_uses_to_thread_twice(
             {
                 "id": "video-123",
                 "title": "Launch Video",
-                "published_at": datetime(2026, 5, 30, 17, 28, 38, tzinfo=timezone.utc),
+                "published_at": datetime(2026, 5, 30, 17, 28, 38, tzinfo=UTC),
                 "thumbnail_url": "https://i.ytimg.com/vi/video-123/maxresdefault.jpg",
                 "description": "A sample description.",
                 "content_type": ContentType.VIDEO,

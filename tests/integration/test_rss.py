@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import asyncio
 
+import httpx
 import pytest
 
 from youtube_notify.rss import rss as rss_module
@@ -12,7 +13,10 @@ pytestmark = pytest.mark.integration
 def test_rss_get_content_returns_mocked_content(
     integration_channel_id: str,
 ) -> None:
-    content = asyncio.run(rss_module.get_content(integration_channel_id))
+    async def get_content() -> set:
+        return await rss_module.get_content(integration_channel_id, httpx.AsyncClient())
+
+    content = asyncio.run(get_content())
 
     assert len(content) == 3
     assert {item.channel.id for item in content} == {integration_channel_id}

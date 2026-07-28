@@ -52,6 +52,30 @@ async def main() -> None:
 asyncio.run(main())
 ```
 
+### Fetching a batch with one HTTP client
+
+Pass one `httpx.AsyncClient` as `rss_client` to share its connection pool across
+all channel requests. The calling application owns and closes the client.
+
+```python
+import asyncio
+
+import httpx
+
+from youtube_notify import get_content
+
+
+async def main() -> None:
+    channel_ids = ["UCxxxxxxxxxxxxxxxxxxxxxx", "UCyyyyyyyyyyyyyyyyyyyyyy"]
+    async with httpx.AsyncClient() as client:
+        results = await asyncio.gather(
+            *(get_content(channel_id, rss_client=client) for channel_id in channel_ids)
+        )
+
+
+asyncio.run(main())
+```
+
 ### Using a YouTube API key
 
 If you already have a YouTube Data API key, build a client with `youtube_notify.youtube.auth.api_key.authenticate()` and pass it to `youtube_notify.get_content()`.
