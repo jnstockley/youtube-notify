@@ -44,9 +44,64 @@ jobs:
       - name: Step 6 - Run Linters
         run: ./scripts/lint.sh
 
-  test:
-    name: Test
+  python-matrix:
+    name: Determine supported Python versions
     runs-on: ubuntu-latest
+    outputs:
+      versions: ${{ steps.versions.outputs.versions }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Setup Python
+        uses: actions/setup-python@v7
+        with:
+          python-version: "3.x"
+          check-latest: true
+
+      - name: Read supported Python minor versions
+        id: versions
+        run: |
+          python - <<'PY' >> "$GITHUB_OUTPUT"
+          import json
+          import re
+          import tomllib
+
+          with open("pyproject.toml", "rb") as project_file:
+              requirement = tomllib.load(project_file)["project"]["requires-python"]
+
+          lower = re.search(r"(?:^|,)\s*>=\s*(\d+)\.(\d+)(?:\.\d+)?", requirement)
+          upper = re.search(r"(?:^|,)\s*<\s*(\d+)\.(\d+)(?:\.\d+)?", requirement)
+          if not lower or not upper:
+              raise SystemExit(
+                  f"Cannot derive Python minor versions from requires-python: {requirement!r}; "
+                  "expected >=lower and <upper bounds"
+              )
+
+          start = tuple(map(int, lower.groups()))
+          end = tuple(map(int, upper.groups()))
+          versions = []
+          major, minor = start
+          while (major, minor) < end:
+              versions.append(f"{major}.{minor}")
+              minor += 1
+              if minor == 100:
+                  major, minor = major + 1, 0
+
+          if not versions:
+              raise SystemExit(f"No supported Python minor versions in {requirement!r}")
+
+          print(f"versions={json.dumps(versions)}")
+          PY
+
+  test:
+    name: Test (Python ${{ matrix.python-version }})
+    runs-on: ubuntu-latest
+    needs: python-matrix
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ${{ fromJSON(needs.python-matrix.outputs.versions) }}
 
     steps:
       - name: Step 1 - Checkout
@@ -55,6 +110,7 @@ jobs:
       - name: Step 2 - Setup Python
         uses: actions/setup-python@v7
         with:
+          python-version: ${{ matrix.python-version }}
           check-latest: true
 
       - name: Step 3 - Install uv
