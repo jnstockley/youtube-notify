@@ -3,11 +3,7 @@ name = "youtube-notify"
 version = "0.1.0"
 description = "Fetches new YouTube channel playlist content from RSS with automatic fallback to the YouTube API."
 readme = "README.md"
-<<<<<<< HEAD
 requires-python = ">=3.11, <3.16"
-=======
-requires-python = ">=3.15, <3.16"
->>>>>>> external/main
 license-files = ["LICENSE"]
 authors = [
     { name = "Jack Stockley", email = "jack@jstockley.com"}
